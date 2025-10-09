@@ -72,6 +72,33 @@ app.delete("/customer/:customerId", async (req, res) => {
 })
 //11KM追加ここまで
 
+//12KM追加分（更新機能）
+app.put("/customer/:customerId", async (req, res) => {
+  const { customerId } = req.params;
+  const { companyName, industry, contact, location } = req.body;
+  try {
+    const result = await pool.query(
+      `UPDATE customers
+         SET company_name = $1,
+             industry = $2,
+             contact = $3,
+             location = $4,
+             updated_date = NOW()
+       WHERE customer_id = $5`,
+      [companyName, industry, contact, location, customerId]
+    );
+    if (result.rowCount === 0) {
+      res.status(404).json({ success: false, error: "not found" });
+      return;
+    }
+    res.json({ success: true });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ success: false, error: "server error" });
+  }
+});
+//12KMここまで
+
 app.post("/add-customer", async (req, res) => {
   try {
     const { companyName, industry, contact, location } = req.body;

@@ -25,6 +25,8 @@
   
   <!-- 11KMで追加したところ（削除ボタン） -->
       <button id="deleteButton" type="button" class="btn btn-danger ml-2">削除</button>
+  <!-- 12KMで追加したところ（更新ボタン） -->
+      <a id="editLink" href="./update.html" class="btn btn-primary ml-2">編集</a>
     </div>
 
     <script type="module">
@@ -58,6 +60,13 @@ deleteButton.addEventListener("click", async () => {
   }
 });
 //11KMここまで
+
+//12KM追加分（編集画面への遷移）
+const editLink = document.getElementById("editLink");
+if (editLink) {
+  editLink.href = `./update.html?id=${encodeURIComponent(customerId)}`;
+}
+//12KMここまで
 
       if (!customerId) {
         alert("顧客IDが指定されていません。");

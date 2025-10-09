@@ -9,10 +9,101 @@
 </head>
 <body>
     <div class="container mt-5">
-        <!-- ここにHTMLを書く -->
+        <!-- 12KM追加分（編集・更新画面） -->
+    <form id="customerForm">
+    <div class="form-group">
+        <label for="companyName">会社名</label>
+        <input type="text" class="form-control" id="companyName" name="companyName" required>
+    </div>
+    <div class="form-group">
+        <label for="industry">業種</label>
+        <input type="text" class="form-control" id="industry" name="industry">
+    </div>
+    <div class="form-group">
+        <label for="contact">連絡先</label>
+        <input type="text" class="form-control" id="contact" name="contact">
+    </div>
+    <div class="form-group">
+        <label for="location">所在地</label>
+        <input type="text" class="form-control" id="location" name="location">
+    </div>
+    <button type="submit" class="btn btn-primary">更新する</button>
+    <a id="backLink" href="./detail.html" class="btn btn-secondary ml-2">詳細に戻る</a>
+    </form>
     </div>
     <script type="module">
-        <!-- ここにJSを書く -->
+        // 12KM追加箇所（更新機能）
+  import config from "../config.js";
+
+  const params = new URLSearchParams(window.location.search);
+  const customerId = params.get("id");
+
+  if (!customerId) {
+    alert("顧客IDが指定されていません。");
+    window.location.href = "./list.html";
+  }
+
+  const form = document.getElementById("customerForm");
+  const companyNameInput = document.getElementById("companyName");
+  const industryInput = document.getElementById("industry");
+  const contactInput = document.getElementById("contact");
+  const locationInput = document.getElementById("location");
+  const backLink = document.getElementById("backLink"); // 戻るリンクに id="backLink" を付けておく
+
+  if (backLink) {
+    backLink.href = `./detail.html?id=${encodeURIComponent(customerId)}`;
+  }
+
+  try {
+    const response = await fetch(`${config.apiUrl}/customer/${customerId}`);
+    if (!response.ok) {
+      alert("顧客情報の取得に失敗しました。");
+      window.location.href = "./list.html";
+    }
+    const customer = await response.json();
+    companyNameInput.value = customer.company_name ?? "";
+    industryInput.value = customer.industry ?? "";
+    contactInput.value = customer.contact ?? "";
+    locationInput.value = customer.location ?? "";
+  } catch (error) {
+    console.error(error);
+    alert("顧客情報の読み込みでエラーが発生しました。");
+    window.location.href = "./list.html";
+  }
+
+  form.addEventListener("submit", async (event) => {
+    event.preventDefault();
+
+    const payload = {
+      companyName: companyNameInput.value.trim(),
+      industry: industryInput.value.trim(),
+      contact: contactInput.value.trim(),
+      location: locationInput.value.trim(),
+    };
+
+    try {
+      const response = await fetch(`${config.apiUrl}/customer/${customerId}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      if (!response.ok) {
+        if (response.status === 404) {
+          alert("更新対象の顧客が見つかりません。");
+        } else {
+          alert(`更新に失敗しました (HTTP ${response.status})`);
+        }
+        return;
+      }
+
+      alert("顧客情報を更新しました。");
+      window.location.href = `./detail.html?id=${encodeURIComponent(customerId)}`;
+    } catch (error) {
+      console.error(error);
+      alert("更新処理でエラーが発生しました。");
+    }
+  });
     </script>
     <!-- BootstrapのJavaScriptの読み込み -->
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
