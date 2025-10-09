@@ -16,6 +16,8 @@
             <th scope="col">#</th>
             <th scope="col">Company Name</th>
             <th scope="col">Contact</th>
+            <th scope="col">Industry</th>
+            <th scope="col">Location</th>
           </tr>
         </thead>
         <tbody id="customer-list">
@@ -26,7 +28,7 @@
 
     <script type="module">
       // ExpressサーバのAPIエンドポイントのURL
-      import config from "./config.js";
+      import config from "../config.js";
 
       fetch(`${config.apiUrl}/customers`)
         .then((response) => {
@@ -41,9 +43,16 @@
             const cell1 = row.insertCell(0);
             const cell2 = row.insertCell(1);
             const cell3 = row.insertCell(2);
+            const cell4 = row.insertCell(3);
+            const cell5 = row.insertCell(4);
             cell1.textContent = index + 1;
-            cell2.textContent = customer.companyname;
+            
+            //10KM変更部分
+            //cell2.textContent = customer.company_name; 変更前
+            cell2.innerHTML = `<a href="./detail.html?id=${customer.customer_id}">${customer.company_name}</a>`;
             cell3.textContent = customer.contact;
+            cell4.textContent = customer.industry;
+            cell5.textContent = customer.location;
           });
         })
         .catch((error) => console.error(error));

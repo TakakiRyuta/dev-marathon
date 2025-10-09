@@ -1,22 +1,102 @@
 <!DOCTYPE html>
 <html lang="ja">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>案件情報入力</title>
-    <!-- Bootstrap CSSの読み込み -->
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
-</head>
-<body>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>顧客情報確認</title>
+    <link
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+    />
+  </head>
+  <body class="bg-light">
     <div class="container mt-5">
-        <!-- ここにHTMLを書く -->
+      <h2 class="mb-4">入力内容の確認</h2>
+      <p class="text-muted">以下の内容で登録してよろしいですか？</p>
+      <table class="table table-bordered bg-white">
+        <tbody>
+          <tr>
+            <th scope="row" class="w-25">会社名</th>
+            <td id="companyNameCell"></td>
+          </tr>
+          <tr>
+            <th scope="row">業種</th>
+            <td id="industryCell"></td>
+          </tr>
+          <tr>
+            <th scope="row">連絡先</th>
+            <td id="contactCell"></td>
+          </tr>
+          <tr>
+            <th scope="row">所在地</th>
+            <td id="locationCell"></td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="d-flex gap-2">
+        <button id="backButton" class="btn btn-secondary me-2">戻って修正</button>
+        <button id="submitButton" class="btn btn-primary">この内容で登録</button>
+      </div>
     </div>
+
     <script type="module">
-        <!-- ここにJSを書く -->
+      import config from "../config.js";
+
+      const storageKey = "pendingCustomer";
+      const stored = sessionStorage.getItem(storageKey);
+
+      if (!stored) {
+        alert("確認するデータが見つかりません。最初から入力し直してください。");
+        window.location.href = "./add.html";
+      } else {
+        const data = JSON.parse(stored);
+        document.getElementById("companyNameCell").textContent = data.companyName ?? "";
+        document.getElementById("industryCell").textContent = data.industry ?? "";
+        document.getElementById("contactCell").textContent = data.contact ?? "";
+        document.getElementById("locationCell").textContent = data.location ?? "";
+      }
+
+      document.getElementById("backButton").addEventListener("click", () => {
+        window.location.href = "./add.html";
+      });
+
+      document.getElementById("submitButton").addEventListener("click", async (event) => {
+        event.preventDefault();
+        const submitButton = document.getElementById("submitButton");
+        submitButton.disabled = true;
+
+        const storedPayload = sessionStorage.getItem(storageKey);
+        if (!storedPayload) {
+          alert("送信データが見つかりません。再度入力してください。");
+          window.location.href = "./add.html";
+          return;
+        }
+
+        const payload = JSON.parse(storedPayload);
+
+        try {
+          const response = await fetch(`${config.apiUrl}/add-customer`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/x-www-form-urlencoded",
+            },
+            body: new URLSearchParams(payload),
+          });
+          const result = await response.json();
+          if (result.success) {
+            alert("顧客情報を登録しました。");
+            sessionStorage.removeItem(storageKey);
+            window.location.href = "./list.html";
+          } else {
+            alert("登録に失敗しました。再度お試しください。");
+            submitButton.disabled = false;
+          }
+        } catch (error) {
+          console.error(error);
+          alert("通信に失敗しました。ネットワーク状態を確認してください。");
+          submitButton.disabled = false;
+        }
+      });
     </script>
-    <!-- BootstrapのJavaScriptの読み込み -->
-    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
-</body>
+  </body>
 </html>

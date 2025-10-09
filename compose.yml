@@ -3,7 +3,7 @@ services:
     container_name: nginx
     image: nginx:stable-bullseye
     ports:
-      - "80:80"
+      - "8081:80"
     volumes:
       - ./src/web:/usr/share/nginx/html
       - ./work:/work
@@ -14,12 +14,14 @@ services:
     container_name: nodejs
     image: node:22-bullseye
     ports:
-      - "1985:1985"
+      - "5237:5237"
     volumes:
       - ./src/node:/app
       - ./work:/work
     working_dir: /app
     tty: true # 開発時のみ有効
+    command: ["node", "index.js"]
+
 
   db:
     container_name: postgres

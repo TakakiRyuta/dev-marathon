@@ -1,0 +1,67 @@
+<!-- 10KMで追加したファイル -->
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>顧客詳細</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" />
+  </head>
+  <body class="bg-light">
+    <div class="container mt-5">
+      <h2 class="mb-4">顧客詳細</h2>
+      <table class="table table-bordered bg-white">
+        <tbody>
+          <tr><th class="w-25">顧客ID</th><td id="customerIdCell"></td></tr>
+          <tr><th>会社名</th><td id="companyNameCell"></td></tr>
+          <tr><th>業種</th><td id="industryCell"></td></tr>
+          <tr><th>連絡先</th><td id="contactCell"></td></tr>
+          <tr><th>所在地</th><td id="locationCell"></td></tr>
+          <tr><th>作成日時</th><td id="createdDateCell"></td></tr>
+          <tr><th>更新日時</th><td id="updatedDateCell"></td></tr>
+        </tbody>
+      </table>
+      <a href="./list.html" class="btn btn-secondary">一覧に戻る</a>
+    </div>
+
+    <script type="module">
+      import config from "../config.js";
+
+      const params = new URLSearchParams(window.location.search);
+      const customerId = params.get("id");
+
+      if (!customerId) {
+        alert("顧客IDが指定されていません。");
+        window.location.href = "./list.html";
+      }
+
+      (async () => {
+        try {
+          const response = await fetch(`${config.apiUrl}/customer/${customerId}`);
+          if (!response.ok) {
+            if (response.status === 404) {
+              alert("顧客が見つかりません。");
+            } else {
+              alert(`エラーが発生しました (HTTP ${response.status})`);
+            }
+            window.location.href = "./list.html";
+            return;
+          }
+
+          const customer = await response.json();
+          document.getElementById("customerIdCell").textContent = customer.customer_id ?? "";
+          document.getElementById("companyNameCell").textContent = customer.company_name ?? "";
+          document.getElementById("industryCell").textContent = customer.industry ?? "";
+          document.getElementById("contactCell").textContent = customer.contact ?? "";
+          document.getElementById("locationCell").textContent = customer.location ?? "";
+          document.getElementById("createdDateCell").textContent = customer.created_date ?? "";
+          document.getElementById("updatedDateCell").textContent = customer.updated_date ?? "";
+        } catch (error) {
+          console.error(error);
+          alert("顧客情報の取得に失敗しました。");
+          window.location.href = "./list.html";
+        }
+      })();
+    </script>
+  </body>
+</html>

@@ -31,28 +31,24 @@
         </form>
     </div>
     <script type="module">
-        import config from '../config.js';
+        const form = document.getElementById('customer-form');
+        const storageKey = 'pendingCustomer';
 
-        document.getElementById('customer-form').addEventListener('submit', function(e) {
-            e.preventDefault();
-            const formData = new FormData(this);
-            fetch(config.apiUrl + '/add-customer', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded'
-                },
-                body: new URLSearchParams([...formData])
-            }).then(response => response.json())
-              .then(data => {
-                if(data.success) {
-                    alert('顧客情報が正常に保存されました。');
-                    // フォームをリセット
-                    document.getElementById('customer-form').reset();
-                } else {
-                    alert('保存に失敗しました。');
-                }
-              })
-              .catch(error => console.error('Error:', error));
+        const stored = sessionStorage.getItem(storageKey);
+        if (stored) {
+            const savedData = JSON.parse(stored);
+            form.companyName.value = savedData.companyName ?? '';
+            form.industry.value = savedData.industry ?? '';
+            form.contact.value = savedData.contact ?? '';
+            form.location.value = savedData.location ?? '';
+        }
+
+        form.addEventListener('submit', (event) => {
+            event.preventDefault();
+            const formData = new FormData(form);
+            const payload = Object.fromEntries(formData.entries());
+            sessionStorage.setItem(storageKey, JSON.stringify(payload));
+            window.location.href = './add-confirm.html';
         });
     </script>
     <!-- BootstrapのJavaScriptの読み込み -->
