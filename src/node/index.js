@@ -53,6 +53,25 @@ app.get("/customer/:customerId", async (req, res) => {
 });
 //10KM追加分ここまで
 
+//11KMで追加したところ(削除のapi)
+app.delete("/customer/:customerId", async (req, res) => {
+  const { customerId } = req.params;
+  try{
+    const result = await pool.query(
+      "DELETE FROM customers WHERE customer_id = $1",
+      [customerId]
+    );
+    if(result.rowCount === 0) {
+      res.status(404).json({ success: false,error: "not found"});
+      return;
+    }
+    res.json({ success: true});
+  } catch (err){
+    res.status(500).json({ success: false, error: "server error"});
+  }
+})
+//11KM追加ここまで
+
 app.post("/add-customer", async (req, res) => {
   try {
     const { companyName, industry, contact, location } = req.body;

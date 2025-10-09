@@ -22,6 +22,9 @@
         </tbody>
       </table>
       <a href="./list.html" class="btn btn-secondary">一覧に戻る</a>
+  
+  <!-- 11KMで追加したところ（削除ボタン） -->
+      <button id="deleteButton" type="button" class="btn btn-danger ml-2">削除</button>
     </div>
 
     <script type="module">
@@ -29,6 +32,32 @@
 
       const params = new URLSearchParams(window.location.search);
       const customerId = params.get("id");
+      
+      // 11KM追加箇所（削除機能）
+      const deleteButton = document.getElementById("deleteButton");
+
+deleteButton.addEventListener("click", async () => {
+  alert("削除していいですか?");
+  try {
+    const response = await fetch(`${config.apiUrl}/customer/${customerId}`, {
+      method: "DELETE",
+    });
+    if (!response.ok) {
+      if (response.status === 404) {
+        alert("削除対象の顧客が見つかりません。");
+      } else {
+        alert(`削除に失敗しました (HTTP ${response.status})`);
+      }
+      return;
+    }
+    alert("顧客情報を削除しました。");
+    window.location.href = "./list.html";
+  } catch (error) {
+    console.error(error);
+    alert("削除処理でエラーが発生しました。");
+  }
+});
+//11KMここまで
 
       if (!customerId) {
         alert("顧客IDが指定されていません。");
