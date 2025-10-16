@@ -3,6 +3,7 @@ on:
   push:
     branches:
       - develop
+
 jobs:
   test:
     runs-on: ubuntu-latest
@@ -14,4 +15,18 @@ jobs:
           SSH_PORT: ${{ secrets.DEV_SSH_PORT }}
           SSH_USER: ${{ secrets.DEV_SSH_USER }}
           SSH_KEY: ${{ secrets.DEV_SSHE_SSH_KEY }}
-      - run: ssh ${{ steps.ssh.outputs.SERVER }} bash /app/ryuta_takaki/deploy.sh ryuta_takaki
+
+      - name: Deploy & run Cypress on staging
+        run: |
+          ssh ${{ steps.ssh.outputs.SERVER }} <<'EOF'
+          set -euo pipefail
+
+          # 1) デプロイ
+          bash /app/ryuta_takaki/deploy.sh ryuta_takaki
+
+          # 2) ホームディレクトリ下の ci ディレクトリへ
+          cd ~/ci
+
+          # 3) 既にCypress・依存環境が整っている前提で実行
+          npx cypress run --headless --browser chrome --spec "cypress/e2e/ryuta_takaki.*"
+          EOF
