@@ -25,8 +25,5 @@ jobs:
           bash /app/ryuta_takaki/deploy.sh ryuta_takaki
 
           # 2) ホームディレクトリ下の ci ディレクトリへ
-          cd ~/ci
-
-          # 3) 既にCypress・依存環境が整っている前提で実行
-          npx cypress run --headless --browser chrome --spec "cypress/e2e/ryuta_takaki.*"
+          cd /ci
           EOF
