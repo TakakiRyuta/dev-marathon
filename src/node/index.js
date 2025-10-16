@@ -12,7 +12,7 @@ const pool = new Pool({
   user: "user_ryuta_takaki", // PostgreSQLのユーザー名に置き換えてください
   host: "localhost",
   database: "db_ryuta_takaki", // PostgreSQLのデータベース名に置き換えてください
-  password: "5Rw5YDaWc5jc", // PostgreSQLのパスワードに置き換えてください
+  password: "pass", // PostgreSQLのパスワードに置き換えてください
   port: 5432,
 });
 
