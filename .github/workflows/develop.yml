@@ -2,7 +2,7 @@ name: deploy pipeline
 on:
   push:
     branches:
-      - main
+      - status
 
 concurrency:
   group: develop-deploy
